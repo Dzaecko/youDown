@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>YouTube Playlist Downloader</title>
+</head>
+<body>
+    <h1>YouTube Playlist to MP3</h1>
+    <form action="/" method="post" id="downloadForm">
+        <label for="url">Playlist URL:</label>
+        <input type="text" id="url" name="url" required>
+        <input type="submit" value="Download & Convert">
+    </form>
+    <div id="status">
+        Total Videos: <span id="total">0</span><br>
+        Currently Downloading (Video Number): <span id="current">0</span><br>
+        Current Video Title: <span id="current_title">-</span>
+    </div>
+
+    <script>
+        $("#downloadForm").submit(function(event) {
+            event.preventDefault();
+            $.post("/", $("#downloadForm").serialize());
+    
+            function updateStatus() {
+                $.getJSON("/status", function(data) {
+                    $("#total").text(data.total);
+                    $("#current").text(data.current);
+                    $("#current_title").text(data.current_title);
+    
+                    if (!data.completed) {  // Überprüfen Sie den "completed"-Status
+                        setTimeout(updateStatus, 1000);  // Update every second
+                    } else {
+                        alert("Download finished!");
+                    }
+                });
+            }
+            
+            updateStatus();
+        });
+    </script>
+</body>
+</html>
